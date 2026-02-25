@@ -4,3 +4,4 @@ python-dotenv>=1.0.0
 jupyter>=1.0.0
 ipykernel>=6.29.0
 nest-asyncio>=1.6.0
+requests>=2.31.0
