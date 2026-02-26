@@ -86,17 +86,24 @@ agent_adk/
 ├── requirements.txt
 ├── SETUP_GUIDE.md
 ├── README.md
+├── ARTICLE_LinkedIn_Agentic_Patterns.md
 └── notebooks/
     ├── Chapter_2_Routing.ipynb
     ├── Chapter_3_Parallelization.ipynb
     ├── Chapter_5_Tool_Use_Google_Search.ipynb
     ├── Chapter_5_Tool_Use_Code_Execution.ipynb
     ├── Chapter_5_Tool_Use_Vertex_AI_Search.ipynb
+    ├── Chapter_6_Enterprise_Supply_Chain.ipynb
     ├── Chapter_7_Sequential.ipynb
     ├── Chapter_7_Parallel.ipynb
     ├── Chapter_7_Coordinator.ipynb
     ├── Chapter_7_Loop.ipynb
-    └── Chapter_7_AgentTool.ipynb
+    ├── Chapter_7_AgentTool.ipynb
+    ├── Chapter_8a_ReAct_Agent.ipynb
+    ├── Chapter_8b_Plan_and_Execute_Agent.ipynb
+    ├── Chapter_MCP_Server.ipynb          ← real FastMCP client-server split
+    ├── pike_place_server.py              ← MCP server (created by Chapter_MCP_Server notebook)
+    └── Capstone_Pike_Place_Fish_Market.ipynb  ← all 14 patterns in one pipeline
 ```
 
 ---
@@ -110,11 +117,20 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from google.adk.agents import Agent
-from google.adk.tools import google_search
+from google.adk.agents import LlmAgent
+from google.adk.tools import FunctionTool
+from google.genai import types as genai_types
 
 print("Google API Key set:", bool(os.environ.get("GOOGLE_API_KEY")))
+print("ADK imported successfully")
 print("All good! You're ready to run the notebooks.")
+```
+
+For the **Chapter_MCP_Server** notebook, also verify FastMCP:
+
+```python
+import fastmcp
+print(f"FastMCP version: {fastmcp.__version__}")
 ```
 
 ---
@@ -133,3 +149,23 @@ uv run python -m ipykernel install --user --name=adk_env --display-name "Python 
 **"GOOGLE_API_KEY not set"** — Ensure `.env` exists with a valid key and `load_dotenv()` is called.
 
 **Wrong kernel in Jupyter** — Select "Python (ADK)" from Kernel > Change Kernel. If it doesn't appear, re-run the `ipykernel install --user` command.
+
+**429 RESOURCE_EXHAUSTED (rate limit)** — All notebooks use `RETRY_CONFIG` with ADK's built-in `HttpRetryOptions` to auto-retry on 429 errors. If you still hit limits with the free Gemini tier, increase `initial_delay` from `2` to `60` in the retry config.
+
+**Chapter_MCP_Server: "No module named fastmcp"** — Run `uv pip install fastmcp>=2.0.0` in your activated venv. The `%%writefile` cell in the notebook creates `pike_place_server.py` — make sure you run that cell before running the client agent cells.
+
+---
+
+## 8. Notebook Order (Recommended)
+
+| Order | Notebook | Pattern |
+|-------|----------|---------|
+| 1 | Chapter_2_Routing | Routing |
+| 2 | Chapter_3_Parallelization | Parallelization |
+| 3 | Chapter_5_Tool_Use_* (3 notebooks) | Tool Use |
+| 4 | Chapter_6_Enterprise_Supply_Chain | Reflection |
+| 5 | Chapter_7_* (5 notebooks) | Multi-Agent Collaboration |
+| 6 | Chapter_8a_ReAct_Agent | ReAct |
+| 7 | Chapter_8b_Plan_and_Execute_Agent | Plan-and-Execute |
+| 8 | Chapter_MCP_Server | Real MCP Client-Server Split |
+| 9 | Capstone_Pike_Place_Fish_Market | All 14 patterns combined |
